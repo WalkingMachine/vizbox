@@ -7,6 +7,7 @@ from sensor_msgs.msg import Image
 from PIL import Image as pil_image
 import base64
 from StringIO import StringIO
+import numpy as np
 
 try:
     from vizbox.msg import Story
@@ -32,12 +33,12 @@ class RosBackend(BackendBase):
 
         rospy.on_shutdown(shutdown_hook)
 
-        self.__encoding = {'rgb8':self.rgba2base64}
+        self.__encoding = {'bgr8':self.rgba2base64}
 
-        self.op_sub = rospy.Subscriber("operator_text", String, call_callbacks_in(self.on_operator_text, lambda rosmsg: rosmsg.data), queue_size=100)
-        self.robot_sub = rospy.Subscriber("robot_text", String, call_callbacks_in(self.on_robot_text, lambda rosmsg: rosmsg.data), queue_size=100)
+        self.op_sub = rospy.Subscriber("sara_command", String, call_callbacks_in(self.on_operator_text, lambda rosmsg: rosmsg.data), queue_size=100)
+        self.robot_sub = rospy.Subscriber("sara_said", String, call_callbacks_in(self.on_robot_text, lambda rosmsg: rosmsg.data), queue_size=100)
         self.step_sub = rospy.Subscriber("challenge_step", UInt32, call_callbacks_in(self.on_challenge_step, lambda rosmsg: rosmsg.data), queue_size=100)
-        self.image_sub = rospy.Subscriber("image", Image, call_callbacks_in(self.on_image, self.ros_image_to_base64), queue_size=100)
+        self.image_sub = rospy.Subscriber("/darknet_ros/detection_image", Image, call_callbacks_in(self.on_image, self.ros_image_to_base64), queue_size=1)
         
         try:
             self.story_sub = rospy.Subscriber("story", Story, call_callbacks_in(self.on_story, lambda rosmsg: (rosmsg.title, rosmsg.storyline)), queue_size=100)
@@ -65,6 +66,13 @@ class RosBackend(BackendBase):
         converted = pil_image.frombytes('RGB',
                                         (rosmsg.width, rosmsg.height),
                                         rosmsg.data)
+        data = np.array(converted)
+        red, green, blue = data.T
+        data = np.array([blue, green, red])
+        data = data.transpose()
+        converted = pil_image.fromarray(data)
+
+
         string_buffer = StringIO()
         converted.save(string_buffer, "png")
         image_bytes = string_buffer.getvalue()
