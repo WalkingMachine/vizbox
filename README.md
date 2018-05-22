@@ -39,7 +39,7 @@ Installation and try out
 ```bash
 git clone git@github.com:WalkingMachine/vizbox.git
 cd vizbox
-sudo pip install -r requirements.txt
+pip install -r requirements.txt --user
 
 roscore # in separate terminal
 ./server.py image:=/usb_cam/image_raw # Remaps the image-topic to output of the USB cam, see below
