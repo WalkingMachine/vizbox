@@ -37,7 +37,7 @@ TODO
 Installation and try out
 -------
 ```bash
-git clone https://github.com/LoyVanBeek/vizbox.git
+git clone git@github.com:WalkingMachine/vizbox.git
 cd vizbox
 sudo pip install -r requirements.txt
 
