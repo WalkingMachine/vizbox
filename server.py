@@ -124,7 +124,7 @@ if __name__ == "__main__":
     debug=True,
     template_path="templates")
 
-    address, port = "localhost", 8888
+    address, port = "0.0.0.0", 8888
     print "Application instantiated"
 
     connected = False
